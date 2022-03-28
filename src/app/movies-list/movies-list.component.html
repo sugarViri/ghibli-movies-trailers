@@ -1,0 +1,5 @@
+<div class="{{ view ==='isListView'? 'movies-list' : 'movies-fav'}}">
+  <div class="card" *ngFor="let movie of movies; let ind=index">
+    <movie-detail [ranking]="ind+1" [movie]="movie" [view]="view" (movieFav)="onFavMovie($event)" (movieDetail)="onDetail($event)"></movie-detail>
+  </div>
+</div>
