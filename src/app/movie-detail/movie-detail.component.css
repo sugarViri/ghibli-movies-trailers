@@ -1,8 +1,4 @@
 .card {
-  /*   max-width: 500px;
-  width: auto;
-  height: auto; */
-
   position: relative;
   display: flex;
   flex-direction: column;
@@ -10,8 +6,7 @@
   word-wrap: break-word;
   background-color: #fff;
   background-clip: border-box;
-  /*   border: 1px solid rgba(0,0,0,.125); */
-  border-radius: 0.25rem; /*  */
+  border-radius: 0.25rem;
 }
 .card .card-img-top {
   cursor: pointer;
@@ -25,7 +20,7 @@
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  margin: 1rem auto auto auto;
+  margin: 1rem auto 3rem auto;
   padding: 0.2rem;
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
@@ -37,6 +32,10 @@
   max-width: 300px;
   max-height: 450px;
   margin: 0.2rem 0;
+/*   border-top-left-radius: calc(0.25rem - 1px);
+  border-top-right-radius: calc(0.25rem - 1px); */
+  border-bottom-left-radius: calc(0.25rem - 1px);
+  border-bottom-right-radius: calc(0.25rem - 1px);
 }
 .detail .card-body {
   max-width: 500px;
@@ -86,7 +85,6 @@
 }
 
 .informationFav {
-  /*  max-width: 260px; */
   max-width: 500px;
   padding: 0.5rem;
   margin-top: 1.5rem;
@@ -99,7 +97,6 @@
   min-width: 260px;
 }
 .fav-style .wrapper {
-  /*   max-width: 250px; */
   max-width: 500px;
   padding: 0.5rem;
 }
@@ -127,10 +124,10 @@
   padding-top: 1.5rem;
 }
 
-/* .card-img-top:hover {
-  opacity: 0.4;
-  transition-delay:0.5s;
-} */
+.fav-info-wrapper {
+  text-align: center;
+}
+
 .fav-icon path {
   max-width: 30px;
   width: auto;
@@ -148,7 +145,7 @@
   fill: #e94242;
   stroke: #e94242;
 }
-/* Tooltip container */
+
 .fav-container {
   position: relative;
   display: inline-block;
@@ -157,7 +154,6 @@
   fill: white;
 }
 
-/* Tooltip text */
 .tooltip-text {
   visibility: hidden;
   width: 120px;
@@ -168,41 +164,10 @@
   border-radius: 6px;
   position: absolute;
   z-index: 1;
-
-  /* Position the tooltip text - see examples below! */
   top: -3px;
   right: 110%;
-
-  /*   Top Tooltip */
-  /*  width: 120px;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -60px; */
 }
-/* Use half of the width (120/2 = 60), to center the tooltip */
 
-/* Right Tooltip
-.tooltip .tooltiptext {
-  top: -5px;
-  left: 105%;
-} */
-
-/* Left Tooltip */
-/* .tooltip .tooltiptext {
-  top: -5px;
-  right: 105%;
-} */
-
-/* Bottom Tooltip
-.tooltip .tooltiptext {
-  width: 120px;
-  top: 100%;
-  left: 50%;
-  margin-left: -60px;
-} */
-/* Use half of the width (120/2 = 60), to center the tooltip */
-
-/* Show the tooltip text when you mouse over the tooltip container */
 .fav-container:hover .tooltip-text {
   visibility: visible;
 }
@@ -246,8 +211,8 @@
     max-width: 800px;
     padding-bottom: 0;
   }
-  .fav-info-wrapper {
+  /* .fav-info-wrapper {
     margin-right: 2rem;
     margin-bottom: 2rem;
-  }
+  } */
 }

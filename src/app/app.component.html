@@ -1,28 +1,17 @@
-<div class="header">
-    <h1>{{ title }}</h1>
-    <nav class="navigation">
-      <div (click)="goHome()"><img src="../assets/17495269101641911942-128.png">
-        <h6></h6>
-      </div>
-      <div (click)="goFavs()"><img src="../assets/15329952491602916224-128.png">
-        <h6>Favs<span> {{updatedFavs.length}}</span></h6>
-      </div>
-    </nav>
+<div class="header" >
+  <h1>{{ title }}</h1>
+  <nav class="navigation">
+    <div (click)="goHome()"><img src="../assets/icon_home.png" alt="home icon">
+      <h6></h6>
+    </div>
+    <div (click)="goFavs()"><img src="../assets/icon_list.png" alt="list icon">
+      <h6>Favs<span [ngClass]="itemsStore.length > 0 ? 'favs-number-active' : 'fav-number-inactive'">
+          {{ itemsStore.length }}</span>
+      </h6>
+    </div>
+  </nav>
 </div>
-
-<div class="content" [ngSwitch]="actualView">
-
-<!--     <movies-list [view]="actualView" *ngIf="isListView" [movies]="moviesArrayFinal" (movieDetail)="onDetail($event)" (favList)="onUpdateFav($event)"></movies-list>
-  <movies-list [view]="actualView"  *ngIf="isFavView && updatedFavs.length > 0"  [movies]="updatedFavs"  (movieDetail)="onDetail($event)" (favList)="onUpdateFav($event)"></movies-list>
-  <movie-detail [view]="actualView" *ngIf="isDetailView" [movie]="detailMovie" (movieFav)="onUpdateFav($event)"></movie-detail> -->
-
-  <movies-list [view]="actualView" *ngSwitchCase="'isListView'" [movies]="moviesList" (movieDetail)="onDetail($event)" (favList)="onUpdateFav($event)"></movies-list>
- <!--  updatedFavs por eventos, itemsStore por servicios -->
-  <movies-list [view]="actualView"  *ngSwitchCase="'isFavView'"  [movies]="itemsStore"  (movieDetail)="onDetail($event)" (favList)="onUpdateFav($event)"></movies-list>
-  <movie-detail [view]="actualView" *ngSwitchCase="'isDetailView'" [movie]="detailMovie" (movieFav)="onUpdateFav($event)"></movie-detail>
-  <movies-list [view]="actualView" *ngSwitchCaseDefault [movies]="moviesList" (movieDetail)="onDetail($event)" (favList)="onUpdateFav($event)"></movies-list>
-
-
+<!--  -->
+<div class="content" #contentArea *ngIf="isScrollEnded">
+  <router-outlet></router-outlet>
 </div>
-
-

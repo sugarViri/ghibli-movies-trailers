@@ -1,19 +1,31 @@
-import { Component, OnInit, OnDestroy, AfterContentChecked } from '@angular/core';
-import { MoviesService } from './services/movies.service';
-import { Router, NavigationStart, Event as NavigationEvent } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, OnDestroy, AfterContentChecked, Inject, PLATFORM_ID, ViewChild, ElementRef, Renderer2, ChangeDetectorRef, AfterContentInit } from '@angular/core';
+import { Router, NavigationStart, Event, NavigationEnd } from '@angular/router';
+import { Subscription, asyncScheduler } from 'rxjs';
 import { FavsService } from './services/favs.service';
+import { MoviesService } from './services/movies.service';
+import { LocationStrategy, isPlatformBrowser } from '@angular/common';
+import { filter, scan, observeOn } from 'rxjs/operators';
 
+interface ScrollPositionRestore {
+  event: Event;
+  positions: { [K: number]: number };
+  trigger: 'imperative' | 'popstate';
+  idToRestore: number;
+}
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css']/* ,
+  changeDetection: ChangeDetectionStrategy.OnPush, */
 })
-export class AppComponent implements OnInit, OnDestroy, AfterContentChecked {
+
+
+export class AppComponent implements OnInit, OnDestroy {
 
   title = 'Ghibli Tour';
   subscriptions: Array<Subscription> = [];
   auxMovies: Array<any> = [];
+  auxTrailer: Array<any> = [];
   moviesList: Array<any> = [];
   updatedFavs: Array<any> = [];
   itemsStore: Array<any> = [];
@@ -23,33 +35,45 @@ export class AppComponent implements OnInit, OnDestroy, AfterContentChecked {
   };
   actualView: string = '';
   actualRoute: string = '';
+  itemSelected: any;
+  viewSelected: any;
+  isFavView: boolean = false;
+  activedRoute: any;
+
+  private _isPopState = false;
+  private _routeScrollPositions: { [url: string]: number } = {};
+  private _deferredRestore = false;
+  listener: any;
+  lastScrollPos: number = 0;
+  private unlistener: () => void = {} as any;
+  isScrollEnded: boolean = true;
+  clickDetail: boolean = false;
+  clickBack: boolean = false;
+
+  @ViewChild('contentArea') public contentArea: ElementRef<any> = {} as ElementRef;
 
   constructor(
     private router: Router,
-    private favData: FavsService,
     private moviesData: MoviesService,
-  ) { }
+    private favData: FavsService,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private locStrat: LocationStrategy,
+    private renderer: Renderer2,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {
+
+  }
 
   ngOnInit(): void {
     this.getSubscriptions();
-  }
-
-  ngAfterContentChecked(): void {
-    this.getActualView();
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((subs: any) => subs.unsubscribe());
+    this.unlistener = this.renderer.listen('window', 'scroll', (e) => {
+      this.getYPosition(e);
+    });
   }
 
   getSubscriptions() {
     this.subscriptions.push(this.favData.itemsObservable$.subscribe((items: Array<any>) => {
       this.itemsStore = items;
-    }));
-
-    this.subscriptions.push(this.moviesData.movies().subscribe((data) => {
-      this.auxMovies.push(data);
-      this.moviesList = this.auxMovies[0];
     }));
 
     this.subscriptions.push(this.router.events.subscribe((event: any) => {
@@ -58,82 +82,108 @@ export class AppComponent implements OnInit, OnDestroy, AfterContentChecked {
         this.getActualView();
       }
     }));
+
+    this.moviesData.getJSON().subscribe((items: Array<any>) => {
+      this.moviesList = items;
+      this.favData.storeMovies(this.moviesList);
+    });
+
+    this.subscriptions.push(this.favData.favViewObservable$.subscribe((item: any) => {
+      this.isFavView = item;
+    }));
+
+    this.subscriptions.push(this.router.events
+      .pipe(
+        filter(
+          event =>
+            event instanceof NavigationStart || event instanceof NavigationEnd,
+        ),
+        scan<Event, ScrollPositionRestore>((acc, event) => ({
+          event,
+          positions: {
+            ...acc.positions,
+            ...(event instanceof NavigationStart
+              ? {
+                [event.id]: this.lastScrollPos
+              }
+              : {}),
+          },
+          trigger:
+            event instanceof NavigationStart
+              ? event.navigationTrigger as 'imperative' || 'popstate'
+              : acc.trigger,
+          idToRestore:
+            (event instanceof NavigationStart &&
+              event.restoredState &&
+              event.restoredState.navigationId + 1) ||
+            acc.idToRestore,
+        })),
+        filter(
+          ({ event, trigger, positions, idToRestore }) => event instanceof NavigationEnd && !!trigger,
+        ),
+        observeOn(asyncScheduler),
+      )
+      .subscribe(({ trigger, positions, idToRestore }) => {
+        if (trigger === 'popstate') {
+          const scrollAmount = this.favData.getScrolledLength();
+          if (scrollAmount !== undefined) {
+            setTimeout(() => {
+              window.scroll({ top: scrollAmount, left: 0, behavior: 'smooth' });
+            }, 300);
+          }
+        }
+      })
+    )
   }
 
-  // TODO: cambiar por un switch?
   getActualView() {
-/*     switch (this.actualRoute) {
-      case '/movies-list':
-        this.actualView = 'isListView';
-        break;
-      case '/movie-detail' || '/movies-detail/:id ':
-        this.actualView = 'isDetailView';
-        break;
-      case '/movies-favs':
-          this.actualView = 'isFavView';
-        break;
-      case '':
-        this.actualView = 'isListView';
-        break;
-      default:
-        this.actualView = 'isListView';
-    } */
-
     if (this.actualRoute === '/movies-list') {
       this.actualView = 'isListView';
+      this.favData.selectView({ actualView: 'isListView' });
     } else if (this.actualRoute.includes('/movie-detail')) {
       this.actualView = 'isDetailView';
-    } else if (this.actualRoute === '/movies-favs' && this.updatedFavs.length === 0) {
+      this.favData.selectView({ actualView: 'isDetailView' });
+    } else if (this.actualRoute === '/movies-favs' && this.itemsStore.length === 0) {
       this.goHome();
     } else if (this.actualRoute === '/movies-favs') {
       this.actualView = 'isFavView';
+      this.favData.selectView({ actualView: 'isFavView' });
     } else if (this.actualRoute === '') {
-      this.actualView = 'isListView';
+      this.actualView = 'isHomeView';
+      this.favData.selectView({ actualView: 'isHomeView' });
     }
-  }
-
-  onUpdateFav(favs: any) {
-    if (!favs.fav) {
-      const idx = this.updatedFavs.findIndex((favObj: any) => {
-        return favObj.id === favs.id
-      });
-      this.favData.deleteItem(idx);
-
-      this.updatedFavs = this.updatedFavs.filter((fv) => {
-        return fv.id != favs.id
-      })
-      console.log('Fav delete: ', this.itemsStore);
-    } else {
-      this.updatedFavs.push(favs.movie);
-      this.favData.addItem(favs.movie);
-      console.log('Fav add: ', this.itemsStore);
-    }
-
-    this.moviesList = this.moviesList.map((mv: any) => {
-      const match = this.updatedFavs.find((fv) => {
-        return mv.id === fv.id
-      });
-      if (match) {
-        mv.fav = true;
-      } else {
-        mv.fav = false;
-      }
-      return mv;
-    })
-  }
-
-  onDetail(mov: any) {
-    this.detailMovie = mov;
-    this.router.navigate(['/movie-detail/', mov.id]);
   }
 
   goHome() {
-    this.router.navigate(['/movies-list/']);
+    this.favData.selectHome();
+    this.favData.selectView({ actualView: 'isHomeView' });
+    this.router.navigate(['']);
   }
 
   goFavs() {
-    if (this.updatedFavs.length > 0) {
+    if (this.itemsStore.length > 0) {
+      this.favData.setScrollLength(this.lastScrollPos);
+      this.favData.selectFav();
+      this.favData.selectView({ actualView: 'isFavView' });
       this.router.navigate(['/movies-favs/']);
+      setTimeout(() => {
+        window.scroll({ top: 0, left: 0, behavior: 'smooth' })
+      }, 100);
+    }
+  }
+
+  ngAfterContentChecked(): void {
+    this.getActualView();
+  }
+
+  getYPosition(e: any): number {
+    return this.lastScrollPos = (e.target.scrollingElement).scrollTop;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subs: any) => subs.unsubscribe());
+    if (this.unlistener) {
+      this.unlistener();
     }
   }
 }

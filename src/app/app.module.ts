@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
@@ -8,24 +8,33 @@ import { MovieDetailComponent } from './movie-detail/movie-detail.component';
 import { APP_BASE_HREF } from '@angular/common';
 import { MoviesService } from './services/movies.service';
 import { FavsService } from './services/favs.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { LimitNumberDirective } from './directives/limit-number.directive';
+import { TrailerViewComponent } from './trailer-view/trailer-view.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { DialogContentComponent } from './dialog-content/dialog-content.component';
+import { ImgLoadDirective } from './directives/img-load.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
     MoviesListComponent,
     MovieDetailComponent,
-    LimitNumberDirective
+    TrailerViewComponent,
+    DialogContentComponent,
+    ImgLoadDirective
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
+    BrowserAnimationsModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    MatDialogModule
   ],
-  providers: [ MoviesService, FavsService, { provide: APP_BASE_HREF, useValue: '/' }],
-  bootstrap: [AppComponent]
+  providers: [ MoviesService, FavsService, { provide: APP_BASE_HREF, useValue: '/' } ],
+  bootstrap: [ AppComponent ],
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
 export class AppModule { }

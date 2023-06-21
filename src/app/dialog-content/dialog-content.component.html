@@ -1,0 +1,12 @@
+<div mat-dialog-content class="mat-typography">
+  <div class="trailer">
+    <div class="player">
+   <!--    <div>Loading... please wait!</div> -->
+      <iframe name="my-iframe" id="my-iframe" width="600" height="400" [src]="safeSrc">
+      </iframe>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close (click)="closeDialog()">Close</button>
+</div>

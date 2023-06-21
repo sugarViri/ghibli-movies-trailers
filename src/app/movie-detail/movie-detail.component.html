@@ -1,66 +1,37 @@
-<div [ngClass]="classView()">
-
+<div class="detail" [ngStyle]="{'background-color': isTrailerChecked ?  '#fad9a8d7': 'white'}" [ngStyle]="{'visibility': areLoaded && !isLoading ?  'visible': 'hidden'}">
   <div class="wrapper">
-    <div class="images">
-      <img *ngIf="view !== 'isFavView'" src="{{ movie.movie.image }}" (click)="showDetail()" class="card-img-top"
+    <div class="images" >
+      <img appImgLoad src="{{ movieDetail.movie.image }}"  class="card-img-top"
         alt="...">
-      <img *ngIf="view !== 'isListView'" src="{{ movie.movie.movie_banner }}" (click)="showDetail()"
+      <img appImgLoad src="{{ movieDetail.movie.movie_banner }}"
         class="card-img-top" alt="...">
     </div>
     <div class="card-body">
       <div class="title">
-        <h5 *ngIf="view !== 'isFavView'; else titleFav">{{ movie.movie.original_title }}</h5>
-        <ng-template #titleFav>
-          <h5>{{ movie.movie.title }}</h5>
-        </ng-template>
-        <div class="fav-container" (click)="toggleFav()" [ngClass]="favClass()">
+        <h5 >{{ movieDetail.movie.original_title }}</h5>
+        <div class="fav-container" (click)="toggleFav()" [ngClass]="!this.movieDetail.fav ? 'fav-icon' : 'fav-icon-fav'">
           <svg xmlns="http://www.w3.org/2000/svg" width="33px" height="33px" viewBox="0 0 24 24">
             <path stroke-width="1"
               d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 01-.686 0 16.709 16.709 0 01-.465-.252 31.147 31.147 0 01-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0114 20.408z" />
           </svg>
-          <span class="tooltip-text">{{ tooltip }}</span>
+          <span class="tooltip-text">{{ movieDetail.fav === false ? 'Add To Favs' : 'Remove Fav' }}</span>
         </div>
       </div>
 
-      <div *ngIf="view === 'isDetailView'" class="information">
-        <h5>{{ movie.movie.original_title_romanised }}</h5>
-        <div><span>Director: </span>{{ movie.movie.director }}</div>
-        <div><span>Year: </span>{{ movie.movie.release_date }}</div>
-        <div><span>Duration: </span>{{ movie.movie.running_time }} min</div>
-        <div><span>RT Score: </span>{{ movie.movie.rt_score }}/100</div>
+      <div class="information">
+        <h5>{{ movieDetail.movie.original_title_romanised }}</h5>
+        <div><span>Director: </span>{{ movieDetail.movie.director }}</div>
+        <div><span>Year: </span>{{ movieDetail.movie.release_date }}</div>
+        <div><span>Duration: </span>{{ movieDetail.movie.running_time }} min</div>
+        <div><span>RT Score: </span>{{ movieDetail.movie.rt_score }}/100</div>
         <h5>Sinopsis</h5>
-        <div>{{ movie.movie.description }}</div>
+        <div>{{ movieDetail.movie.description }}</div>
       </div>
     </div>
   </div>
-  <!-- <div *ngIf="view === 'isFavView'" class="information">
-    <h5>{{ movie.movie.original_title }}</h5>
-    <div><span>Director: </span>{{ movie.movie.director }}</div>
-    <div><span>Year: </span>{{ movie.movie.release_date }}</div>
-    <div><span>Duration: </span>{{ movie.movie.running_time }} min</div>
-    <div><span>RT Score: </span>{{ movie.movie.rt_score }}/100</div>
-    <h5>Sinopsis</h5>
-    <div>{{ movie.movie.description }}</div>
-  </div> -->
-  <div *ngIf="view === 'isFavView'" class="fav-info-wrapper">
-    <div class="inputFav">
-      <div><span>Ranking: </span>{{ranking}}</div>
-      <form [formGroup]="createRanking">
-        <div><input type="number" maxlength="2" (focus)="clearScore()" (keypress)="keyPressNumbers($event)"
-            [(ngModel)]="inputScore" formControlName="fullScore" /> / 10</div>
 
-        <button type="submit" (click)="addScore()" class="">Add Score</button>
-      </form>
-    <div class="warning" [ngStyle]="{'visibility':showWarning ? 'visible' : 'hidden'}" >{{ warningMessge }}</div>
-    </div>
-    <div class="informationFav">
-      <!--       <h5>{{ movie.movie.original_title }}</h5> -->
-      <div><span>Director: </span>{{ movie.movie.director }}</div>
-      <div><span>Year: </span>{{ movie.movie.release_date }}</div>
-      <div><span>Duration: </span>{{ movie.movie.running_time }} min</div>
-      <div><span>RT Score: </span>{{ movie.movie.rt_score }}/100</div>
-    </div>
-
+  <div class="fav-info-wrapper">
+      <trailer-view [movie] = "movieDetail" (checkTrailer)="onCheckTrailer($event)"></trailer-view>
   </div>
 
 </div>

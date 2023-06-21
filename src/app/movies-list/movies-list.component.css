@@ -7,9 +7,211 @@
   min-width: 250px;
   margin: 1rem;
 }
-/* .movies-fav {
-} */
+
 .movies-fav .card {
   margin: 1rem;
+  flex-direction: initial;
+}
+
+.movies-fav button {
+  background-color: #aaebd5;
+  border: 1px solid #aaebd5;
+  border-radius: 1rem;
+  box-sizing: border-box;
+  color: #303030;
+  font-family: "Helvetica Neue",Arial;
+  font-size: .875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  padding: .75rem 1rem;
+  text-align: center;
+  text-decoration: none #D1D5DB solid;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin-right: 0.6rem;
+}
+
+.movies-fav button:hover {
+  background-color: #97dac6;
+}
+
+.inputFav > div:first-child {
+  margin-left: 0.6rem;
+}
+
+.inputFav form > div:first-child {
+  padding-top: 0.6rem;
+  margin-left: 0.6rem;
+}
+
+.list-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border-radius: 0.25rem;
+}
+.list-card .card-img-top {
+  cursor: pointer;
+}
+
+.fav-style .card-img-top {
+  cursor: pointer;
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.title h5 {
+  font-size: 1rem;
+  margin-top: 0.3rem;
+}
+
+.inputFav {
+  min-width: 260px;
+}
+
+.inputFav input {
+  max-width: 70px;
+  text-align: right;
+  padding-right: 0.4rem;
+}
+.inputFav form {
+  display: flex;
+  justify-content: space-between;
+}
+
+.informationFav {
+  max-width: 500px;
+  padding: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.informationFav div {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  min-width: 260px;
+}
+.fav-style .wrapper {
+  max-width: 500px;
+  padding: 0.5rem;
+}
+.fav-style {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+  max-width: 500px;
+  height: auto;
+  margin: auto;
+}
+
+.fav-style .warning {
+  color: red;
+  margin-top: 0.4rem;
+  margin-left: 0.6rem;
+}
+
+.checked {
+  background-color: #fac87e;
+}
+
+.fav-icon path {
+  max-width: 30px;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+  fill: white;
+  stroke: #3f3f3f;
+}
+
+.fav-icon-fav path {
+  max-width: 30px;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+  fill: #e94242;
+  stroke: #e94242;
+}
+
+.fav-container {
+  position: relative;
+  display: inline-block;
+}
+.fav-container svg {
+  fill: white;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  top: -3px;
+  right: 110%;
+}
+
+.fav-container:hover .tooltip-text {
+  visibility: visible;
+}
+
+@media (min-width: 500px) {
+  .list-card {
+    max-width: 300px;
+  }
+  .detail {
+    max-width: 700px;
+    padding: 1rem;
+  }
+
+  .detail .images {
+    max-width: 260px;
+    margin: 1rem;
+  }
+
+  .fav-style .card-img-top {
+    border-bottom-left-radius: calc(0.25rem - 1px);
+    border-bottom-right-radius: calc(0.25rem - 1px);
+    max-width: 350px;
+    height: auto;
+  }
+  .detail .card-img-top {
+    max-width: 300px;
+    max-height: 450px;
+    margin: 1rem;
+  }
+  .detail .card-body {
+    max-width: 300px;
+    width: auto;
+    height: auto;
+    margin: 1rem;
+  }
+}
+@media (min-width: 900px) {
+  .fav-style {
+    justify-content: space-between;
+    padding: 1.5rem;
+    max-width: 800px;
+    padding-bottom: 0;
+    width: 750px;
+  }
+  .fav-info-wrapper {
+    margin-bottom: 2rem;
+  }
 }
 

@@ -1,27 +1,74 @@
-# Ghibli
+<p align="center">
+  <img src="src/assets/ghibli_all.png">
+</p>
+
+# Ghibli Tour 	:star2:
+>View, select and rate your favourite Ghibli Studio movies and create your own ranking! Made with Angular12 as Frontend and Jest for testing.
+>
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.16.
 
-## Development server
+## Objectives
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+:zap: Learn new framework: Angular
 
-## Code scaffolding
+:zap: Consume external API - Update 2023: API no longer available, JSON instead
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+:zap: Select and rate favourites to create a ranking
 
-## Build
+:zap: Display YouTube trailer with iframe
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+:zap: Apply services to update data for different routes
 
-## Running unit tests
+:zap: Custom directive to serve images when all loaded
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+:zap: Manage scroll behaviour on navigation: back and new route (why, Angular? why this default?)
 
-## Running end-to-end tests
+:zap: Field custom validations on rating
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+:zap: Responsive 
 
-## Further help
+:zap: Unit testing with Jest  
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+***
+<p style="display: flex; flex-wrap: wrap; justify-content: space-around; margin-top: 1rem;">
+  <img style="margin-top: 1rem;" src="src/assets/fav_mobile.png" width="200" height="400">
+  <img style="margin-top: 1rem;" src="src/assets/init_mobile.png" width="200" height="400">
+  <img style="margin-top: 1rem;" src="src/assets/detail_mobile.png" width="200" height="400">
+</p>
+
+<p style="display: flex; flex-wrap: wrap; justify-content: space-around">
+  <img style="margin-top: 1rem;" src="src/assets/initial_tablet.png" width="400" height="400">
+  <img style="margin-top: 1rem;" src="src/assets/detail_tablet.png" width="400" height="400">
+  <img style="margin-top: 1rem;" src="src/assets/trailer_tablet.png" width="400" height="400">
+  <img style="margin-top: 1rem;" src="src/assets/rating_tablet.png" width="400" height="400">
+</p>
+
+***
+
+
+
+## Installation <img style="position: relative; top: 4px" src="src/assets/dust-man.png" width="18" height="18"/>
+
+Clone the repo, then install with Npm or Yarn and run with ng serve
+
+```javascript
+npm install
+ng serve
+```
+Run global / unit tests
+```javascript
+npm run test:lib
+npm run test:lib specific-operative.component.spec.ts
+```
+## Credits
+
+API from James Anaipakos, great , beautifully documented
+
+[https://github.com/janaipakos](https://github.com/janaipakos)
+
+[https://ghibliapi.herokuapp.com](https://ghibliapi.herokuapp.com)
+
+
+January 2023 Update: API sadly no longer available at herokuapp, updated with JSON instead.

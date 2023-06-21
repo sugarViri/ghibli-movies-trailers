@@ -1,4 +1,4 @@
-import { from, Observable, of as observableOf, of, pipe, throwError } from 'rxjs';
+import { of as observableOf, of } from 'rxjs';
 import { MoviesService } from './movies.service';
 
 describe('MoviesService', () => {
@@ -16,15 +16,23 @@ describe('MoviesService', () => {
       });
     }
   };
+  const sanit = {
+    bypassSecurityTrustResourceUrl: () => {
+      return of({
+        url: 'https://www.youtube.com/embed/92a7Hj0ijLs'
+      })
+    }
+  }
 
   beforeEach(() => {
     service = new MoviesService(
-      http as any
+      http as any,
+      sanit as any
     );
   });
 
   it('should run #movies()', async () => {
-    service.movies().subscribe();
+    service.getMovies().subscribe();
     service.http.get = () => {
       return of({
         url: {
@@ -33,20 +41,21 @@ describe('MoviesService', () => {
 
       });
     }
-    service.movies().subscribe();
+    service.getMovies().subscribe();
   });
 
-  it('should run #movies2()', async () => {
-    service.movies2();
-    service.http.get = () => {
+  it('should run #getVideoFrame()', async () => {
+    service.getVideoFrame('https://www.youtube.com/watch?v=92a7Hj0ijLs').subscribe();
+    service.sanitizier.bypassSecurityTrustResourceUrl = () => {
       return of({
-        body: {
-          base: 'https://ghibliapi.herokuapp.com/films'
+        url: {
+          base: 'https://www.youtube.com/watch?v=92a7Hj0ijLs'
         },
 
       });
     }
-    service.movies2();
+    service.getVideoFrame('https://www.youtube.com/watch?v=92a7Hj0ijLs').subscribe();
+    service.getVideoFrame('null').subscribe();
   });
 
 });

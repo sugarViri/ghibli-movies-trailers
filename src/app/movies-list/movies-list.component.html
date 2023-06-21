@@ -1,5 +1,69 @@
-<div class="{{ view ==='isListView'? 'movies-list' : 'movies-fav'}}">
-  <div class="card" *ngFor="let movie of movies; let ind=index">
-    <movie-detail [ranking]="ind+1" [movie]="movie" [view]="view" (movieFav)="onFavMovie($event)" (movieDetail)="onDetail($event)"></movie-detail>
+<div *ngIf="!isFavourites" class='movies-list'  [ngStyle]="{'visibility': areLoaded && !this.isLoading ?  'visible': 'hidden'}">
+  <div class="card" *ngFor="let film of updatedList; let ind=index">
+    <div class='list-card' [ngClass]="film.checked ? 'checked' : ''">
+      <div class="wrapper">
+        <div class="images" >
+          <img appImgLoad src="{{ film.movie.image }}" (click)="showDetail(film)" class="card-img-top" alt="...">
+        </div>
+        <div class="card-body">
+          <div class="title">
+            <h5>{{ film.movie.original_title }}</h5>
+            <div class="fav-container" (click)="toggleFav(film)"
+              [ngClass]="film.fav === false ? 'fav-icon' : 'fav-icon-fav'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="33px" height="33px" viewBox="0 0 24 24">
+                <path stroke-width="1"
+                  d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 01-.686 0 16.709 16.709 0 01-.465-.252 31.147 31.147 0 01-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0114 20.408z" />
+              </svg>
+              <span class="tooltip-text">{{ film.fav === false ? 'Add To Favs' : 'Remove Fav' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div *ngIf="isFavourites" class='movies-fav' #refFavList  [ngStyle]="{'visibility': areLoaded && !this.isLoading ?  'visible': 'hidden'}">
+  <div class="card" *ngFor="let fav of favList; let ind=index">
+    <div class='fav-style'>
+      <div class="wrapper">
+        <div class="images">
+          <img appImgLoad src="{{ fav.movie.movie_banner }}" (click)="showDetail(fav)" class="card-img-top" alt="...">
+        </div>
+        <div class="card-body">
+          <div class="title">
+            <h5>{{ fav.movie.title }}</h5>
+            <div class="fav-container" (click)="toggleFav(fav)"
+              [ngClass]="fav.fav === false ? 'fav-icon' : 'fav-icon-fav'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="33px" height="33px" viewBox="0 0 24 24">
+                <path stroke-width="1"
+                  d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 01-.686 0 16.709 16.709 0 01-.465-.252 31.147 31.147 0 01-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0114 20.408z" />
+              </svg>
+              <span class="tooltip-text">{{ 'Remove Fav' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fav-info-wrapper">
+        <div class="inputFav">
+          <div><span>Ranking: </span>{{ind + 1}}</div>
+          <form [formGroup]="createRanking">
+            <div><input #inputRef type="number" (focus)="clearScore(fav)" (keypress)="limitNumberLength($event)"
+                formControlName="fullScore" [placeholder]="fav.score ? fav.score : 0"
+                [value]="fav.score ? fav.score : 0" /> / 10</div>
+            <button type="submit" (click)="addScore(createRanking.value.fullScore, ind, fav)" class="">Add
+              Score</button>
+          </form>
+          <div class="warning" [ngStyle]="{'visibility':fav.wrongScore ? 'visible' : 'hidden'}">{{ warningMessge }}
+          </div>
+        </div>
+        <div class="informationFav">
+          <div><span>Director: </span>{{ fav.movie.director }}</div>
+          <div><span>Year: </span>{{ fav.movie.release_date }}</div>
+          <div><span>Duration: </span>{{ fav.movie.running_time }} min</div>
+          <div><span>RT Score: </span>{{ fav.movie.rt_score }}/100</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,8 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { FavsService } from '../services/favs.service';
+import { ImageLoadService } from '../services/image-load.service';
 import { Subscription } from 'rxjs';
-import { FormGroup, FormBuilder, Validators, FormControl, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 
 @Component({
   selector: 'movie-detail',
@@ -11,118 +11,75 @@ import { FormGroup, FormBuilder, Validators, FormControl, ValidatorFn, AbstractC
 })
 export class MovieDetailComponent implements OnInit, OnDestroy {
 
-  subscription: Subscription = new Subscription;
-  items: any;
-  tooltip: string = '';
-  classMovieDetail = '';
+  subscriptions: Array<Subscription> = [];
 
-  isFav: boolean = false;
-  favList: Array<any> = [];
+  itemsFav: Array<any> = [];
+  actualRoute: string = '';
+  movieDetail: any;
+  isTrailerChecked: boolean = false;
+  imagesLoaded: number = 0;
+  areLoaded: boolean = false;
+  isLoading: boolean = true;
+  scrollLength: number | undefined;
+  isScrolled: boolean = false;
 
-  inputScore: number | null = null;
-  createRanking: FormGroup;
-  numberRegEx = /^-?(0|[1-9]\d*)?$/;
-  showWarning:boolean = false;
-  warningMessge:string = 'Enter a valid score';
+  constructor(
+    private router: Router,
+    private favDataDet: FavsService,
+    private imgLoaded: ImageLoadService
+  ) {
 
-  @Input() movie: any;
-  @Input() view: any;
-  @Input() ranking: any;
-  @Output() movieFav: EventEmitter<any> = new EventEmitter<any>();
-  @Output() movieDetail: EventEmitter<any> = new EventEmitter<any>();
-
-  constructor(private router: Router, private favData: FavsService, private fb: FormBuilder) {
-    this.createRanking = this.fb.group({
-      fullScore: new FormControl(this.inputScore, [Validators.required, Validators.maxLength(2), this.customValidator()])
-    })
-  }
-
-
-
-  customValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const forbidden = control.value > 10 || control.value < 0;
-      console.log('Forbidden', forbidden)
-      return forbidden ? { forbiddenName: { value: control.value } } : null;
-    }
-  }
-
-  keyPressNumbers(event: any) {
-    if (this.inputScore != null) {
-      if (this.inputScore.toString().length >= 2) {
-        debugger;
-        this.inputScore = parseInt(this.inputScore.toString().slice(0, 1));
-      }
-    }
   }
 
   ngOnInit(): void {
-    this.isFav = this.movie.fav;
-
-    this.subscription = this.favData.itemsObservable$.subscribe((items: Array<any>) => {
-      this.items = items;
-    });
-    this.classView();
-    this.tooltipText();
-
+    this.actualRoute = this.router.url;
+    this.movieDetail = this.favDataDet.getMovie();
+    setTimeout(() => {
+      window.scroll({ top: 0, left: 0, behavior: 'smooth' })
+    }, 0);
+    setTimeout(() => {
+      this.isLoading = false
+    }, 260)
+    this.getSubscriptions();
   }
 
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+  getSubscriptions() {
+    this.subscriptions.push(this.favDataDet.itemsObservable$.subscribe((items: Array<any>) => {
+      this.itemsFav = items;
+    }));
+
+    this.subscriptions.push(this.imgLoaded.imagesLoading$.subscribe((item: any) => {
+      this.imagesLoaded = item;
+        this.checkLoaded();
+    }));
   }
 
-  classView(): string {
-    if (this.view === 'isDetailView') {
-      return this.classMovieDetail = 'detail';
-    } else if (this.view === 'isListView') {
-      return this.classMovieDetail = 'card';
+  checkLoaded() {
+    if (this.imagesLoaded === 0) {
+      return this.areLoaded = true;
     } else {
-      return this.classMovieDetail = 'fav-style'
+      return this.areLoaded = false;
     }
+  }
+
+  onCheckTrailer(evt: string) {
+    evt === 'Visto' ? this.isTrailerChecked = true : this.isTrailerChecked = false;
   }
 
   toggleFav() {
-    this.isFav = this.isFav ? false : true;
-    this.movieFav.emit({ movie: this.movie, id: this.movie.id, fav: this.isFav });
-    this.tooltipText();
-  }
-  favIcon(): string {
-    return !this.isFav ? 'fav-icon' : 'fav-icon-fav';
-  }
-
-  favClass(): string {
-    return !this.isFav ? 'fav-icon' : 'fav-icon-fav';
-  }
-
-  tooltipText(): string {
-    return !this.isFav ? this.tooltip = 'Add To Favs' : this.tooltip = 'Remove Fav';
-  }
-
-  showDetail() {
-    this.router.navigate(['/movie-detail/', this.movie.id]);
-    this.movieDetail.emit(this.movie);
-  }
-
-  clearScore() {
-    this.inputScore=null
-    this.showWarning = false
-  }
-
-  addScore() {
-    console.log(this.createRanking.value);
-    if (this.createRanking.invalid) {
-      this.showWarning = true;
-      this.inputScore = null;
-      console.log('Invalid')
+    this.movieDetail.fav = !this.movieDetail.fav;
+    if (!this.movieDetail.fav) {
+      const idx = this.itemsFav.findIndex((favObj: any) => {
+        return favObj.id === this.movieDetail.id
+      });
+      this.favDataDet.deleteItem(idx);
     } else {
-      console.log('Valid')
-  /*     this.favData.addItemScore(this.movie, this.inputScore); */
-      this.showWarning = false;
+      this.favDataDet.addItem(this.movieDetail);
     }
+  }
 
-
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subs: any) => subs.unsubscribe());
   }
 
 }
